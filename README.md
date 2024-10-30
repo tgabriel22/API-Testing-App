@@ -18,4 +18,4 @@
 - CSS Modules
 - Jest & React Testing Library
 
-[просмотр проекта в режиме реального времени](https://api-testing-app.vercel.app/)
+[Cмотрите проекта в режиме реального времени](https://api-testing-app.vercel.app/)
