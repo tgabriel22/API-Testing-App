@@ -17,4 +17,5 @@
 - Ant Design
 - CSS Modules
 - Jest & React Testing Library
-  [просмотр проекта в режиме реального времени]()
+
+[просмотр проекта в режиме реального времени](https://api-testing-app.vercel.app/)
