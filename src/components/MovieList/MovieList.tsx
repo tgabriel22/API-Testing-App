@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { movieStore } from "../../mobx/movieStore";
-import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import { Card, Button, Row, Col } from "antd";
 import "./MovieList.module.css";
 
+const { Meta } = Card;
+
 const MovieList: React.FC = observer(() => {
-  useEffect(() => {
-    movieStore.loadMovies();
-  }, []);
   const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
   const [newTitle, setNewTitle] = useState<string>("");
+
+  useEffect(() => {
+    if (movieStore.movies.length < 1) {
+      movieStore.loadMovies();
+    }
+  }, [movieStore.movies]);
 
   const handleEditClick = (movieId: number, currentTitle: string) => {
     setEditingMovieId(movieId);
@@ -26,42 +30,63 @@ const MovieList: React.FC = observer(() => {
     movieStore.deleteMovie(movieId);
   };
 
-  useInfiniteScroll();
-
   return (
-    <div className="movie-list">
+    <Row gutter={[16, 16]} justify="center">
       {movieStore.movies.map((movie) => (
-        <div key={movie.id} className="movie-card">
-          {editingMovieId === movie.id ? (
-            <>
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-              />
-              <button onClick={() => handleSaveClick(movie.id)}>Save</button>
-              <button onClick={() => setEditingMovieId(null)}>Cancel</button>
-            </>
-          ) : (
-            <>
-              <h3>{movie.title}</h3>
-              <p>Release Date: {movie.release_date}</p>
+        <Col xs={24} sm={12} md={8} key={movie.id}>
+          <Card
+            hoverable
+            cover={
               <img
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                 alt={movie.title}
+                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
               />
-              <button onClick={() => handleEditClick(movie.id, movie.title)}>
-                Edit
-              </button>
-              <button onClick={() => handleDeleteClick(movie.id)}>
-                Delete
-              </button>
-            </>
-          )}
-        </div>
+            }
+            className="movie-card"
+          >
+            {editingMovieId === movie.id ? (
+              <div>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+                <Button
+                  type="primary"
+                  onClick={() => handleSaveClick(movie.id)}
+                >
+                  Save
+                </Button>
+                <Button onClick={() => setEditingMovieId(null)}>Cancel</Button>
+              </div>
+            ) : (
+              <div>
+                <Meta
+                  title={movie.title}
+                  description={`Release Date: ${movie.release_date}`}
+                />
+                <div className="movie-card-buttons">
+                  <Button
+                    onClick={() => handleEditClick(movie.id, movie.title)}
+                    type="link"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteClick(movie.id)} // Inline arrow function
+                    type="link"
+                    danger
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Card>
+        </Col>
       ))}
       {movieStore.isLoading && <p>Loading more movies...</p>}
-    </div>
+    </Row>
   );
 });
 

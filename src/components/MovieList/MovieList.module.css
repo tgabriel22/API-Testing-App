@@ -1,4 +1,4 @@
-.movie-list {
+/* .movie-list {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -17,4 +17,25 @@
   margin: 8px 4px;
   padding: 4px 8px;
   cursor: pointer;
+} */
+
+.movie-card {
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-card-buttons {
+  display: none;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  gap: 8px;
+}
+
+.movie-card:hover .movie-card-buttons {
+  display: flex;
 }
