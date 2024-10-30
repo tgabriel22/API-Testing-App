@@ -7,25 +7,30 @@ import "./MovieList.module.css";
 const { Meta } = Card;
 
 const MovieList: React.FC = observer(() => {
+  // Состояния для редактирования фильма и нового названия
   const [editingMovieId, setEditingMovieId] = useState<number | null>(null);
   const [newTitle, setNewTitle] = useState<string>("");
 
+  // Эффект для загрузки фильмов при первом рендере, если список пуст
   useEffect(() => {
     if (movieStore.movies.length < 1) {
       movieStore.loadMovies();
     }
   }, [movieStore.movies]);
 
+  // Функция для начала редактирования фильма, устанавливает ID и текущее название
   const handleEditClick = (movieId: number, currentTitle: string) => {
     setEditingMovieId(movieId);
     setNewTitle(currentTitle);
   };
 
+  // Функция для сохранения изменений названия фильма
   const handleSaveClick = (movieId: number) => {
     movieStore.editMovie(movieId, newTitle);
-    setEditingMovieId(null);
+    setEditingMovieId(null); // Завершение режима редактирования
   };
 
+  // Функция для удаления фильма по его ID
   const handleDeleteClick = (movieId: number) => {
     movieStore.deleteMovie(movieId);
   };
@@ -45,6 +50,7 @@ const MovieList: React.FC = observer(() => {
             className="movie-card"
           >
             {editingMovieId === movie.id ? (
+              // Блок редактирования названия фильма
               <div>
                 <input
                   type="text"
@@ -60,6 +66,7 @@ const MovieList: React.FC = observer(() => {
                 <Button onClick={() => setEditingMovieId(null)}>Cancel</Button>
               </div>
             ) : (
+              // Отображение информации о фильме и кнопок управления
               <div>
                 <Meta
                   title={movie.title}

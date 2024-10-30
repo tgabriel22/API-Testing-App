@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { fetchMovies } from "../assets/services/api";
 
+// Определение интерфейса Movie для типизации свойств фильма
 export interface Movie {
   id: number;
   title: string;
@@ -9,35 +10,37 @@ export interface Movie {
 }
 
 class MovieStore {
-  movies: Movie[] = [];
-  currentPage: number = 1;
-  isLoading: boolean = false;
-  hasMore: boolean = true;
+  movies: Movie[] = []; // Массив фильмов
+  currentPage: number = 1; // Текущая страница для пагинации
+  isLoading: boolean = false; // Флаг загрузки данных
+  hasMore: boolean = true; // Флаг наличия дополнительных данных
 
   constructor() {
-    makeAutoObservable(this);
-    this.setupInfiniteScroll();
+    makeAutoObservable(this); // Автоматическое отслеживание изменений
+    this.setupInfiniteScroll(); // Инициализация бесконечной прокрутки
   }
 
+  // Метод для загрузки фильмов с сервера
   async loadMovies() {
     if (this.isLoading || !this.hasMore) return;
 
-    this.isLoading = true;
+    this.isLoading = true; // Установка флага загрузки
     try {
-      const newMovies = await fetchMovies(this.currentPage);
+      const newMovies = await fetchMovies(this.currentPage); // Запрос новых фильмов
 
       runInAction(() => {
+        // Обновление состояния с новыми фильмами
         this.movies = [...this.movies, ...newMovies];
-        this.currentPage++;
-        this.hasMore = newMovies.length > 0;
+        this.currentPage++; // Увеличение страницы для следующего запроса
+        this.hasMore = newMovies.length > 0; // Обновление флага наличия данных
       });
     } finally {
       runInAction(() => {
-        this.isLoading = false;
+        this.isLoading = false; // Сброс флага загрузки после завершения
       });
     }
   }
-
+  // Установка функции бесконечной прокрутки
   setupInfiniteScroll() {
     const handleScroll = () => {
       if (
@@ -46,23 +49,23 @@ class MovieStore {
         !this.isLoading &&
         this.hasMore
       ) {
-        this.loadMovies();
+        this.loadMovies(); // Вызов loadMovies при достижении конца страницы
       }
     };
-
+    // Добавление обработчика события прокрутки
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll); // Удаление обработчика при размонтировании
   }
 
-  // Edit a movie by its ID
+  // Метод для редактирования фильма по его ID
   editMovie(id: number, newTitle: string) {
     const movie = this.movies.find((movie) => movie.id === id);
     if (movie) {
-      movie.title = newTitle;
+      movie.title = newTitle; // Обновление названия фильма
     }
   }
 
-  // Delete a movie by its ID
+  // Метод для удаления фильма по его ID
   deleteMovie(id: number) {
     this.movies = this.movies.filter((movie) => movie.id !== id);
   }
